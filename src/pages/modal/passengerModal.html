@@ -1,0 +1,88 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      Yolcular
+    </ion-title>
+    <ion-buttons start>
+      <button ion-button (click)="dismiss()">
+        <span ion-text color="primary" showWhen="ios">Kapat</span>
+        <ion-icon name="md-close" showWhen="android, windows"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+<ion-list>
+  <ion-item>
+    <ion-label>Sınıf</ion-label>
+    <ion-select [(ngModel)]="flightClass" interface="action-sheet" (ionChange)="changeClass(flightClass)" cancelText="Vazgeç">
+      <ion-option value="Economy" selected="true">Ekonomi</ion-option>
+      <ion-option value="Business">Business</ion-option>
+      <ion-option value="Comfort">Comfort</ion-option>
+      <ion-option value="First-Class">First Class</ion-option>
+    </ion-select>
+  </ion-item>
+  </ion-list>
+
+  <div padding>
+  <ion-grid>
+  <ion-row>
+    <ion-col col-2 align-self-center text-center>
+        <ion-icon name="remove-circle" (click)="removePassenger('Yetiskin')" tappable></ion-icon>
+    </ion-col>
+    <ion-col align-self-center text-center>
+         <span class="text-2"><b>{{passengerCounts['Yetiskin']}} </b></span> <span class="text-5">Yetişkin</span><br>
+         <span class="text-6 color-grey-2">(18 yaş ve üstü)</span>
+    </ion-col>
+    <ion-col col-2 align-self-center text-center>
+         <ion-icon name="add-circle" (click)="addPassenger('Yetiskin')" tappable></ion-icon>
+    </ion-col>
+  </ion-row>
+
+  <ion-row class="margin-top-1">
+    <ion-col col-2 align-self-center text-center>
+        <ion-icon name="remove-circle" (click)="removePassenger('Cocuk')" tappable></ion-icon>
+    </ion-col>
+    <ion-col align-self-center text-center>
+         <span class="text-2"><b>{{passengerCounts['Cocuk']}} </b></span> <span class="text-5">Çocuk</span> <br>
+         <span class="text-6 color-grey-2">(2-11 Yaş)</span>
+    </ion-col>
+    <ion-col col-2 align-self-center text-center>
+         <ion-icon name="add-circle" (click)="addPassenger('Cocuk')" tappable></ion-icon>
+    </ion-col>
+  </ion-row>
+
+  <ion-row class="margin-top-1">
+    <ion-col col-2 align-self-center text-center>
+        <ion-icon name="remove-circle" (click)="removePassenger('Bebek')" tappable></ion-icon>
+    </ion-col>
+    <ion-col align-self-center text-center>
+         <span class="text-2"><b>{{passengerCounts['Bebek']}}</b></span> <span class="text-5">Bebek</span><br>
+         <span class="text-6 color-grey-2">(2 yaş altı)</span>
+    </ion-col>
+    <ion-col col-2 align-self-center text-center>
+         <ion-icon name="add-circle" (click)="addPassenger('Bebek')" tappable></ion-icon>
+    </ion-col>
+  </ion-row>
+
+  <ion-row class="margin-top-1">
+    <ion-col col-2 align-self-center text-center>
+        <ion-icon name="remove-circle" (click)="removePassenger('Yasli')" tappable></ion-icon>
+    </ion-col>
+    <ion-col align-self-center text-center>
+         <span class="text-2"><b>{{passengerCounts['Yasli']}} </b></span> <span class="text-5">Yaşlı</span><br>
+         <span class="text-6 color-grey-2">(65 yaş ve üstü)</span>
+    </ion-col>
+    <ion-col col-2 align-self-center text-center>
+         <ion-icon name="add-circle" (click)="addPassenger('Yasli')" tappable></ion-icon>
+    </ion-col>
+  </ion-row>
+
+</ion-grid>
+</div>
+
+<div padding>
+   <button ion-button block secondary (click) = "dismiss()">Tamam</button>
+</div>
+
+</ion-content>

@@ -1,11 +1,11 @@
 <ion-menu [content]="content">
-  <ion-header>
-    <ion-toolbar>
-      <ion-title>Menu</ion-title>
-    </ion-toolbar>
-  </ion-header>
 
   <ion-content>
+    <div class="cover cover-4 bg-light-grey">
+    <div class="inner" text-center>
+      Logo
+    </div>
+  </div>
     <ion-list>
       <button menuClose ion-item *ngFor="let p of pages" (click)="openPage(p)">
         {{p.title}}

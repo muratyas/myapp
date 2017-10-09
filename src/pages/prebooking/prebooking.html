@@ -1,0 +1,428 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Rezervasyon</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+
+
+<ion-list class="ticket-list">
+  <ion-list-header>Bilet Listesi</ion-list-header>
+
+  <ion-item *ngFor="let ticket of selectedTickets">
+
+            <div class="summary">
+            <div class="w100 table-display">
+                <div class="coll text-left middle text-7 text-nowrap">
+                    <img class="visible-xs pull-left" alt="{{ticket.OperatingAirlineName}}" src="http://api.biletkolay.net/cdn/airlinelogos/mobile/{{ticket.OperatingAirline}}.png" border="0" style="height:20px;vertical-align:middle;"> {{ticket.OperatingAirlineName}}
+                </div>
+
+            </div>
+            <div class="w100 ticketBox table-display nofixed">
+
+                <div class="coll column2 middle text-left">
+                    <div class="text-5 text-semibold  text-nowrap">
+                        {{ticket.DepartureTime}}
+                        <span class="text-6 color-grey text-normal">({{ticket.OriginCode}})</span>
+                    </div>
+                    <div class="text-5 text-semibold text-nowrap" style="margin-top:5px;" *ngIf="ticket.R_DepartureTime">
+                        {{ticket.R_DepartureTime}}
+                        <span class="text-6 color-grey text-normal">({{ticket.R_OriginCode}})</span>
+                    </div>
+                </div>
+                <div class="coll column3 top text-center">
+                    <img src="assets/img/departure-plane.svg" border="0" class="img-responsive">
+                    <span class="text-8 display-block" *ngIf="ticket.Details?.length > 1 || (ticket.TicketType!='Local' && ticket.Details.Departure?.length > 1)">Aktarmalı</span>
+                    <span class="text-8 display-block" *ngIf="ticket.Details?.length == 1 || (ticket.TicketType!='Local' && ticket.Details.Departure?.length == 1)">Direk Uçuş</span>
+
+                    <img src="assets/img/arrival-plane.svg" border="0" class="img-responsive" style="margin-top:10px;" *ngIf="ticket.TicketType!='Local' && ticket.Details.Arrival?.length">
+
+                    <span class="text-8 display-block" *ngIf="ticket.TicketType!='Local' && ticket.Details.Arrival?.length > 1">Aktarmalı</span>
+                    <span class="text-8 display-block" *ngIf="ticket.TicketType!='Local' && ticket.Details.Arrival?.length == 1">Direk Uçuş</span>
+                </div>
+                <div class="coll column4 middle text-right">
+                    <div class="text-5 text-semibold text-nowrap">
+                        <span class="text-6 color-grey text-normal">
+                                ({{ticket.DestinationCode}})
+                                </span> {{ticket.ArrivalTime}}
+                    </div>
+
+                    <div class="text-5 text-semibold text-nowrap" *ngIf="ticket.R_ArrivalTime" style="margin-top:5px;">
+                        <span class="text-6 color-grey text-normal">
+                                ({{ticket.R_DestinationCode}})
+                                </span> {{ticket.R_ArrivalTime}}
+                    </div>
+                </div>
+                <div class="coll column5 text-right middle text-4 text-semibold">
+                    <button ion-button round outline icon-right (click)="ticketModal(ticket,'out')">
+                      Detay
+                      <ion-icon name="arrow-forward"></ion-icon>
+                    </button>
+                </div>
+
+            </div>
+            <div class="w100 table-display">
+                <div class="coll text-left middle text-7 text-nowrap" *ngIf="ticket.R_OperatingAirlineName">
+                    <img alt="{{ticket.R_OperatingAirlineName}}" src="http://api.biletkolay.net/cdn/airlinelogos/mobile/{{ticket.R_OperatingAirline}}.png" border="0" style="height:20px;vertical-align:middle;">
+                    <span [innerText]="ticket.R_OperatingAirlineName"></span>
+                </div>
+            </div>
+
+
+        </div>
+  </ion-item>
+  <ion-list-header>Özet</ion-list-header>
+  <ion-item class="priceSummary">
+
+  <ion-grid>
+  <ion-row align-items-center>
+    <ion-col text-left>
+      Toplam : {{totalAmount | number:'2.2-2'}} TL
+    </ion-col>
+    <ion-col text-center>
+      {{passengerCount}} Kişi
+    </ion-col>
+    <ion-col text-right>
+        <button class="text-6" ion-button small round outline icon-right (click)="priceDetailModal(paxReferences)">
+          Detay
+          <ion-icon name="arrow-forward"></ion-icon>
+        </button>
+    </ion-col>
+  </ion-row>
+  </ion-grid>
+
+
+  </ion-item>
+</ion-list>
+
+<form #f="ngForm" (ngSubmit)="prebooking(f)" novalidate>
+
+  <ion-item-group *ngFor="let passenger of passengers;let i = index;">
+    <ion-item-divider color="light">{{passenger.name}} Yolcu Bilgileri</ion-item-divider>
+    <ion-item [id]="'firstname['+i+']'">
+      <ion-label floating>Yolcu Adı</ion-label>
+      <ion-input type="text" value="" [(ngModel)]="passenger.firstname" [name]="'firstname['+i+']'" (input)="uppercaseValue($event,i,'firstname')" (ionFocus)="focus(firstname)" (ionBlur)="blur(firstname)" minlength="2" maxlength="30" min="2" max="30" required #firstname="ngModel"></ion-input>
+    </ion-item>
+
+    <div class="error-message" *ngIf="f.submitted && firstname.errors?.required && firstname.untouched">
+      <b>Lütfen yolcu adını yazınız</b>
+    </div>
+    <div class="error-message" *ngIf="!firstname?.focussed && firstname.touched && firstname.invalid">
+      <b *ngIf="firstname.errors?.required">Lütfen yolcu adını yazınız</b>
+      <b *ngIf="!firstname.errors?.required && firstname.invalid">Yolcu adı hatalı</b>
+    </div>
+ 
+    <ion-item [id]="'lastname['+i+']'">
+    <ion-label floating>Yolcu Soyadı</ion-label>
+      <ion-input type="text" [(ngModel)]="passenger.lastname" [name]="'lastname['+i+']'" (input)="uppercaseValue($event,i,'lastname')" min="2" max="30" minlength="2" maxlength="30" (ionFocus)="focus(lastname)" (ionBlur)="blur(lastname)" required #lastname="ngModel"></ion-input>
+    </ion-item>
+
+   <div class="error-message" *ngIf="f.submitted && lastname.errors?.required && lastname.untouched">
+      <b>Lütfen yolcu soyadını yazınız</b>
+    </div>
+    <div class="error-message" *ngIf="!lastname?.focussed && lastname.touched && lastname.invalid">
+      <b *ngIf="lastname.errors?.required">Lütfen yolcu soyadını yazınız</b>
+      <b *ngIf="!lastname.errors?.required && lastname.invalid">Yolcu soyadı hatalı</b>
+    </div>
+
+    <ion-item [hidden]="passenger.noIdentity" [id]="'identity['+i+']'">
+    <ion-label floating>T.C. Kimlik No</ion-label>
+      <ion-input type="tel" [(ngModel)]="passenger.identity" [name]="'identity['+i+']'" [required]="!passenger.noIdentity" (ionFocus)="focus(identity)" (ionBlur)="blur(identity)" #identity="ngModel" minlength="11" maxlength="11"></ion-input>
+    </ion-item>
+
+     <div class="error-message" *ngIf="f.submitted && identity.errors?.required && identity.untouched && !passenger.noIdentity">
+      <b>Lütfen T.C. kimlik no yazınız</b>
+    </div>
+    <div class="error-message" *ngIf="!identity?.focussed && identity.touched && identity.invalid && !passenger.noIdentity">
+      <b *ngIf="identity.errors?.required">Lütfen T.C. kimlik no yazınız</b>
+      <b *ngIf="!identity.errors?.required && identity.invalid">T.C. kimlik no hatalı</b>
+    </div>
+
+    <ion-item text-right>
+      <ion-label class="text-5">T.C. vatandaşı değil</ion-label>
+      <ion-toggle [(ngModel)]="passenger.noIdentity" [name]="'noIdentity['+i+']'"></ion-toggle>
+    </ion-item>
+
+    <ion-item [id]="'birthday['+i+']'">
+      <ion-label floating>Doğum Tarihi</ion-label>
+      <ion-datetime displayFormat="DD/MM/YYYY" [(ngModel)]="passenger.birthday" [name]="'birthday['+i+']'" cancelText="Vazgeç" doneText="Tamam" min="{{minDate}}" max="{{maxDate}}" #birthday="ngModel" required></ion-datetime>
+    </ion-item>
+
+    <div class="error-message" *ngIf="f.submitted && birthday.errors?.required && birthday.untouched">
+      <b>Lütfen yolcu doğum tarihini giriniz</b>
+    </div>
+
+    <ion-item [id]="'gender['+i+']'">
+      <ion-label>Cinsiyet</ion-label>
+      <ion-select [(ngModel)]="passenger.gender" interface="action-sheet" cancelText="Vazgeç" okText="Tamam" [name]="'gender['+i+']'" #gender="ngModel" required>
+        <ion-option value="M">Erkek</ion-option>
+        <ion-option value="F">Kadın</ion-option>
+      </ion-select>
+    </ion-item>
+
+    <div class="error-message" *ngIf="f.submitted && gender.errors?.required && gender.untouched">
+      <b>Lütfen yolcu cinsiyetini seçiniz</b>
+    </div>
+
+
+        <ion-item-divider color="light">İletişim Bilgileri</ion-item-divider>
+    
+    <ion-item id="email">
+       <ion-label floating>E-posta adresi</ion-label>
+      <ion-input type="email" name="email" minlength="9" maxlength="150" (ionFocus)="focus(emailAddress)" (ionBlur)="blur(emailAddress)" [(ngModel)]="email" #emailAddress="ngModel" required></ion-input>
+    </ion-item>
+
+    <div class="error-message" *ngIf="f.submitted && emailAddress.errors?.required && emailAddress.untouched">
+      <b>Lütfen email adresini yazınız</b>
+    </div>
+    <div class="error-message" *ngIf="!emailAddress?.focussed && emailAddress.touched && emailAddress.invalid">
+      <b *ngIf="emailAddress.errors?.required">Lütfen email adresini yazınız</b>
+      <b *ngIf="!emailAddress.errors?.required && emailAddress.invalid">Email adresi hatalı</b>
+    </div>
+
+    <ion-item id="areaCode">
+       <ion-label floating>Telefon Ülke kodu</ion-label>
+       <ion-select name="areaCode" cancelText="Vazgeç" okText="Tamam" [(ngModel)]="areaCode" #countryCode="ngModel" required>
+                <ion-option value="90" selected="true">Türkiye (+90)</ion-option>
+                <ion-option value="213">Algeria (+213)</ion-option>
+                <ion-option value="376">Andorra (+376)</ion-option>
+                <ion-option value="244">Angola (+244)</ion-option>
+                <ion-option value="1264">Anguilla (+1264)</ion-option>
+                <ion-option value="1268">Antigua &amp; Barbuda (+1268)</ion-option>
+                <ion-option value="54">Argentina (+54)</ion-option>
+                <ion-option value="374">Armenia (+374)</ion-option>
+                <ion-option value="297">Aruba (+297)</ion-option>
+                <ion-option value="61">Australia (+61)</ion-option>
+                <ion-option value="43">Austria (+43)</ion-option>
+                <ion-option value="994">Azerbaijan (+994)</ion-option>
+                <ion-option value="1242">Bahamas (+1242)</ion-option>
+                <ion-option value="973">Bahrain (+973)</ion-option>
+                <ion-option value="880">Bangladesh (+880)</ion-option>
+                <ion-option value="1246">Barbados (+1246)</ion-option>
+                <ion-option value="375">Belarus (+375)</ion-option>
+                <ion-option value="32">Belgium (+32)</ion-option>
+                <ion-option value="501">Belize (+501)</ion-option>
+                <ion-option value="229">Benin (+229)</ion-option>
+                <ion-option value="1441">Bermuda (+1441)</ion-option>
+                <ion-option value="975">Bhutan (+975)</ion-option>
+                <ion-option value="591">Bolivia (+591)</ion-option>
+                <ion-option value="387">Bosnia Herzegovina (+387)</ion-option>
+                <ion-option value="267">Botswana (+267)</ion-option>
+                <ion-option value="55">Brazil (+55)</ion-option>
+                <ion-option value="673">Brunei (+673)</ion-option>
+                <ion-option value="359">Bulgaria (+359)</ion-option>
+                <ion-option value="226">Burkina Faso (+226)</ion-option>
+                <ion-option value="257">Burundi (+257)</ion-option>
+                <ion-option value="855">Cambodia (+855)</ion-option>
+                <ion-option value="237">Cameroon (+237)</ion-option>
+                <ion-option value="1">Canada (+1)</ion-option>
+                <ion-option value="238">Cape Verde Islands (+238)</ion-option>
+                <ion-option value="1345">Cayman Islands (+1345)</ion-option>
+                <ion-option value="236">Central African Republic (+236)</ion-option>
+                <ion-option value="56">Chile (+56)</ion-option>
+                <ion-option value="86">China (+86)</ion-option>
+                <ion-option value="57">Colombia (+57)</ion-option>
+                <ion-option value="269">Comoros (+269)</ion-option>
+                <ion-option value="242">Congo (+242)</ion-option>
+                <ion-option value="682">Cook Islands (+682)</ion-option>
+                <ion-option value="506">Costa Rica (+506)</ion-option>
+                <ion-option value="385">Croatia (+385)</ion-option>
+                <ion-option value="53">Cuba (+53)</ion-option>
+                <ion-option value="90392">Cyprus North (+90392)</ion-option>
+                <ion-option value="357">Cyprus South (+357)</ion-option>
+                <ion-option value="42">Czech Republic (+42)</ion-option>
+                <ion-option value="45">Denmark (+45)</ion-option>
+                <ion-option value="253">Djibouti (+253)</ion-option>
+                <ion-option value="1809">Dominica (+1809)</ion-option>
+                <ion-option value="1809">Dominican Republic (+1809)</ion-option>
+                <ion-option value="593">Ecuador (+593)</ion-option>
+                <ion-option value="20">Egypt (+20)</ion-option>
+                <ion-option value="503">El Salvador (+503)</ion-option>
+                <ion-option value="240">Equatorial Guinea (+240)</ion-option>
+                <ion-option value="291">Eritrea (+291)</ion-option>
+                <ion-option value="372">Estonia (+372)</ion-option>
+                <ion-option value="251">Ethiopia (+251)</ion-option>
+                <ion-option value="500">Falkland Islands (+500)</ion-option>
+                <ion-option value="298">Faroe Islands (+298)</ion-option>
+                <ion-option value="679">Fiji (+679)</ion-option>
+                <ion-option value="358">Finland (+358)</ion-option>
+                <ion-option value="33">France (+33)</ion-option>
+                <ion-option value="594">French Guiana (+594)</ion-option>
+                <ion-option value="689">French Polynesia (+689)</ion-option>
+                <ion-option value="241">Gabon (+241)</ion-option>
+                <ion-option value="220">Gambia (+220)</ion-option>
+                <ion-option value="7880">Georgia (+7880)</ion-option>
+                <ion-option value="49">Germany (+49)</ion-option>
+                <ion-option value="233">Ghana (+233)</ion-option>
+                <ion-option value="350">Gibraltar (+350)</ion-option>
+                <ion-option value="30">Greece (+30)</ion-option>
+                <ion-option value="299">Greenland (+299)</ion-option>
+                <ion-option value="1473">Grenada (+1473)</ion-option>
+                <ion-option value="590">Guadeloupe (+590)</ion-option>
+                <ion-option value="671">Guam (+671)</ion-option>
+                <ion-option value="502">Guatemala (+502)</ion-option>
+                <ion-option value="224">Guinea (+224)</ion-option>
+                <ion-option value="245">Guinea - Bissau (+245)</ion-option>
+                <ion-option value="592">Guyana (+592)</ion-option>
+                <ion-option value="509">Haiti (+509)</ion-option>
+                <ion-option value="504">Honduras (+504)</ion-option>
+                <ion-option value="852">Hong Kong (+852)</ion-option>
+                <ion-option value="36">Hungary (+36)</ion-option>
+                <ion-option value="354">Iceland (+354)</ion-option>
+                <ion-option value="91">India (+91)</ion-option>
+                <ion-option value="62">Indonesia (+62)</ion-option>
+                <ion-option value="98">Iran (+98)</ion-option>
+                <ion-option value="964">Iraq (+964)</ion-option>
+                <ion-option value="353">Ireland (+353)</ion-option>
+                <ion-option value="972">Israel (+972)</ion-option>
+                <ion-option value="39">Italy (+39)</ion-option>
+                <ion-option value="1876">Jamaica (+1876)</ion-option>
+                <ion-option value="81">Japan (+81)</ion-option>
+                <ion-option value="962">Jordan (+962)</ion-option>
+                <ion-option value="7">Kazakhstan (+7)</ion-option>
+                <ion-option value="254">Kenya (+254)</ion-option>
+                <ion-option value="686">Kiribati (+686)</ion-option>
+                <ion-option value="850">Korea North (+850)</ion-option>
+                <ion-option value="82">Korea South (+82)</ion-option>
+                <ion-option value="965">Kuwait (+965)</ion-option>
+                <ion-option value="996">Kyrgyzstan (+996)</ion-option>
+                <ion-option value="856">Laos (+856)</ion-option>
+                <ion-option value="371">Latvia (+371)</ion-option>
+                <ion-option value="961">Lebanon (+961)</ion-option>
+                <ion-option value="266">Lesotho (+266)</ion-option>
+                <ion-option value="231">Liberia (+231)</ion-option>
+                <ion-option value="218">Libya (+218)</ion-option>
+                <ion-option value="417">Liechtenstein (+417)</ion-option>
+                <ion-option value="370">Lithuania (+370)</ion-option>
+                <ion-option value="352">Luxembourg (+352)</ion-option>
+                <ion-option value="853">Macao (+853)</ion-option>
+                <ion-option value="389">Macedonia (+389)</ion-option>
+                <ion-option value="261">Madagascar (+261)</ion-option>
+                <ion-option value="265">Malawi (+265)</ion-option>
+                <ion-option value="60">Malaysia (+60)</ion-option>
+                <ion-option value="960">Maldives (+960)</ion-option>
+                <ion-option value="223">Mali (+223)</ion-option>
+                <ion-option value="356">Malta (+356)</ion-option>
+                <ion-option value="692">Marshall Islands (+692)</ion-option>
+                <ion-option value="596">Martinique (+596)</ion-option>
+                <ion-option value="222">Mauritania (+222)</ion-option>
+                <ion-option value="269">Mayotte (+269)</ion-option>
+                <ion-option value="52">Mexico (+52)</ion-option>
+                <ion-option value="691">Micronesia (+691)</ion-option>
+                <ion-option value="373">Moldova (+373)</ion-option>
+                <ion-option value="377">Monaco (+377)</ion-option>
+                <ion-option value="976">Mongolia (+976)</ion-option>
+                <ion-option value="1664">Montserrat (+1664)</ion-option>
+                <ion-option value="212">Morocco (+212)</ion-option>
+                <ion-option value="258">Mozambique (+258)</ion-option>
+                <ion-option value="95">Myanmar (+95)</ion-option>
+                <ion-option value="264">Namibia (+264)</ion-option>
+                <ion-option value="674">Nauru (+674)</ion-option>
+                <ion-option value="977">Nepal (+977)</ion-option>
+                <ion-option value="31">Netherlands (+31)</ion-option>
+                <ion-option value="687">New Caledonia (+687)</ion-option>
+                <ion-option value="64">New Zealand (+64)</ion-option>
+                <ion-option value="505">Nicaragua (+505)</ion-option>
+                <ion-option value="227">Niger (+227)</ion-option>
+                <ion-option value="234">Nigeria (+234)</ion-option>
+                <ion-option value="683">Niue (+683)</ion-option>
+                <ion-option value="672">Norfolk Islands (+672)</ion-option>
+                <ion-option value="670">Northern Marianas (+670)</ion-option>
+                <ion-option value="47">Norway (+47)</ion-option>
+                <ion-option value="968">Oman (+968)</ion-option>
+                <ion-option value="680">Palau (+680)</ion-option>
+                <ion-option value="507">Panama (+507)</ion-option>
+                <ion-option value="675">Papua New Guinea (+675)</ion-option>
+                <ion-option value="595">Paraguay (+595)</ion-option>
+                <ion-option value="51">Peru (+51)</ion-option>
+                <ion-option value="63">Philippines (+63)</ion-option>
+                <ion-option value="48">Poland (+48)</ion-option>
+                <ion-option value="351">Portugal (+351)</ion-option>
+                <ion-option value="1787">Puerto Rico (+1787)</ion-option>
+                <ion-option value="974">Qatar (+974)</ion-option>
+                <ion-option value="262">Reunion (+262)</ion-option>
+                <ion-option value="40">Romania (+40)</ion-option>
+                <ion-option value="7">Russia (+7)</ion-option>
+                <ion-option value="250">Rwanda (+250)</ion-option>
+                <ion-option value="378">San Marino (+378)</ion-option>
+                <ion-option value="239">Sao Tome &amp; Principe (+239)</ion-option>
+                <ion-option value="966">Saudi Arabia (+966)</ion-option>
+                <ion-option value="221">Senegal (+221)</ion-option>
+                <ion-option value="381">Serbia (+381)</ion-option>
+                <ion-option value="248">Seychelles (+248)</ion-option>
+                <ion-option value="232">Sierra Leone (+232)</ion-option>
+                <ion-option value="65">Singapore (+65)</ion-option>
+                <ion-option value="421">Slovak Republic (+421)</ion-option>
+                <ion-option value="386">Slovenia (+386)</ion-option>
+                <ion-option value="677">Solomon Islands (+677)</ion-option>
+                <ion-option value="252">Somalia (+252)</ion-option>
+                <ion-option value="27">South Africa (+27)</ion-option>
+                <ion-option value="34">Spain (+34)</ion-option>
+                <ion-option value="94">Sri Lanka (+94)</ion-option>
+                <ion-option value="290">St. Helena (+290)</ion-option>
+                <ion-option value="1869">St. Kitts (+1869)</ion-option>
+                <ion-option value="1758">St. Lucia (+1758)</ion-option>
+                <ion-option value="249">Sudan (+249)</ion-option>
+                <ion-option value="597">Suriname (+597)</ion-option>
+                <ion-option value="268">Swaziland (+268)</ion-option>
+                <ion-option value="46">Sweden (+46)</ion-option>
+                <ion-option value="41">Switzerland (+41)</ion-option>
+                <ion-option value="963">Syria (+963)</ion-option>
+                <ion-option value="886">Taiwan (+886)</ion-option>
+                <ion-option value="7">Tajikstan (+7)</ion-option>
+                <ion-option value="66">Thailand (+66)</ion-option>
+                <ion-option value="228">Togo (+228)</ion-option>
+                <ion-option value="676">Tonga (+676)</ion-option>
+                <ion-option value="1868">Trinidad &amp; Tobago (+1868)</ion-option>
+                <ion-option value="216">Tunisia (+216)</ion-option>
+                <ion-option value="7">Turkmenistan (+7)</ion-option>
+                <ion-option value="993">Turkmenistan (+993)</ion-option>
+                <ion-option value="1649">Turks &amp; Caicos Islands (+1649)</ion-option>
+                <ion-option value="688">Tuvalu (+688)</ion-option>
+                <ion-option value="256">Uganda (+256)</ion-option>
+                <ion-option value="44">UK (+44)</ion-option>
+                <ion-option value="380">Ukraine (+380)</ion-option>
+                <ion-option value="971">United Arab Emirates (+971)</ion-option>
+                <ion-option value="598">Uruguay (+598)</ion-option>
+                <ion-option value="1">USA (+1)</ion-option>
+                <ion-option value="7">Uzbekistan (+7)</ion-option>
+                <ion-option value="678">Vanuatu (+678)</ion-option>
+                <ion-option value="379">Vatican City (+379)</ion-option>
+                <ion-option value="58">Venezuela (+58)</ion-option>
+                <ion-option value="84">Vietnam (+84)</ion-option>
+                <ion-option value="84">Virgin Islands - British (+1284)</ion-option>
+                <ion-option value="84">Virgin Islands - US (+1340)</ion-option>
+                <ion-option value="681">Wallis &amp; Futuna (+681)</ion-option>
+                <ion-option value="969">Yemen (North)(+969)</ion-option>
+                <ion-option value="967">Yemen (South)(+967)</ion-option>
+                <ion-option value="260">Zambia (+260)</ion-option>
+                <ion-option value="263">Zimbabwe (+263)</ion-option>
+       </ion-select>
+       <div class="error-message" *ngIf="f.submitted && countryCode.errors?.required && countryCode.untouched">
+        <b>Lütfen ülke kodunu seçiniz</b>
+      </div>
+    </ion-item>
+
+    <ion-item id="phone">
+       <ion-label floating>Telefon numarası</ion-label>
+       <ion-input type="tel" name="phone" [(ngModel)]="phone" (ionFocus)="focus(phoneNumber)" (ionBlur)="blur(phoneNumber)" minlength="10" maxlength="20" #phoneNumber="ngModel" required></ion-input>
+    </ion-item>
+
+    <div class="error-message" *ngIf="f.submitted && phoneNumber.errors?.required && phoneNumber.untouched">
+      <b>Lütfen telefon numaranızı yazınız</b>
+    </div>
+    <div class="error-message" *ngIf="!phoneNumber?.focussed && phoneNumber.touched && phoneNumber.invalid">
+      <b *ngIf="phoneNumber.errors?.required">Lütfen telefon numaranızı yazınız</b>
+      <b *ngIf="!phoneNumber.errors?.required && phoneNumber.invalid">Telefon numarası hatalı</b>
+    </div>
+
+  </ion-item-group>
+
+
+
+<div padding>
+  <button type="submit" ion-button block secondary >Satın Al</button>
+</div>
+</form>
+</ion-content>

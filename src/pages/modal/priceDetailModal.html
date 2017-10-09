@@ -1,0 +1,49 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      Detaylar
+    </ion-title>
+    <ion-buttons start>
+      <button ion-button (click)="dismiss()">
+        <ion-icon name="md-close"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+
+<ion-card *ngFor="let price of prices">
+  <ion-item-divider>{{passengerTypes[price.PaxReference.LocalPaxType]}}</ion-item-divider>
+  <ion-card-content>
+
+  <table class="w100 text-6 text-left">
+              <thead>
+                <tr>
+                  <th>Fiyat</th>
+                  <th>Vergi</th>
+                  <th>Hizmet</th>
+                  <th>Toplam</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{{price.BaseFare | number:'2.2-2'}} TL</td>
+                  <td>{{price.Taxes | number:'2.2-2'}} TL</td>
+                  <td>{{price.ServiceFee | number:'2.2-2'}} TL</td>
+                  <td>{{price.TotalFare | number:'2.2-2'}} TL</td>
+                </tr>
+              </tbody>
+            </table>
+
+  </ion-card-content>
+</ion-card>
+
+
+<ion-item item-block>
+  <ion-icon name="calculator" item-start></ion-icon>
+  Toplam fiyat
+  <ion-badge  class="text-4" item-end>{{totalAmount}} TL</ion-badge>
+</ion-item>
+
+
+</ion-content>

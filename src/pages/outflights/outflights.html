@@ -1,0 +1,99 @@
+<ion-header>
+  <ion-navbar>
+<ion-buttons start>
+    <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    </ion-buttons>
+    <ion-title>Gidiş Uçuşları</ion-title>
+    <ion-buttons end>
+      <button ion-button icon-only color="royal" (click)="sortActionSheet()">
+        <ion-icon name="funnel"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+
+</ion-header>
+
+<ion-content>
+
+<ion-card *ngIf="!OutFlights?.length && !progress">
+  <ion-card-content class="padding-bottom">
+    Bilet bulunamadı
+  </ion-card-content>
+</ion-card>
+
+<ion-list class="ticket-list" [hidden] = "!OutFlights?.length">
+  <ion-item *ngFor="let ticket of OutFlights | sort: SortField">
+
+            <div class="summary">
+            <div class="w100 table-display">
+                <div class="coll text-left middle text-7 text-nowrap">
+                    <img class="visible-xs pull-left" alt="{{ticket.OperatingAirlineName}}" src="http://api.biletkolay.net/cdn/airlinelogos/mobile/{{ticket.OperatingAirline}}.png" border="0" style="height:20px;vertical-align:middle;"> {{ticket.OperatingAirlineName}}
+                </div>
+                <div class="coll text-right middle text-4 text-semibold color-main-1 visible-xs" *ngIf="!allocateType">
+                    {{ticket.NetFare}} TL
+                </div>
+            </div>
+            <div class="w100 ticketBox table-display nofixed">
+
+                <div class="coll column2 middle text-left">
+                    <div class="text-5 text-semibold  text-nowrap">
+                        {{ticket.DepartureTime}}
+                        <span class="text-6 color-grey text-normal">({{ticket.OriginCode}})</span>
+                    </div>
+                    <div class="text-5 text-semibold text-nowrap" style="margin-top:5px;" *ngIf="ticket.R_DepartureTime">
+                        {{ticket.R_DepartureTime}}
+                        <span class="text-6 color-grey text-normal">({{ticket.R_OriginCode}})</span>
+                    </div>
+                </div>
+                <div class="coll column3 top text-center">
+                    <img src="assets/img/departure-plane.svg" border="0" class="img-responsive">
+                    <span class="text-8 display-block" *ngIf="ticket.Details?.length > 1 || (ticket.TicketType!='Local' && ticket.Details.Departure?.length > 1)">Aktarmalı</span>
+                    <span class="text-8 display-block" *ngIf="ticket.Details?.length == 1 || (ticket.TicketType!='Local' && ticket.Details.Departure?.length == 1)">Direk Uçuş</span>
+
+                    <img src="assets/img/arrival-plane.svg" border="0" class="img-responsive" style="margin-top:10px;" *ngIf="ticket.TicketType!='Local' && ticket.Details.Arrival?.length">
+
+                    <span class="text-8 display-block" *ngIf="ticket.TicketType!='Local' && ticket.Details.Arrival?.length > 1">Aktarmalı</span>
+                    <span class="text-8 display-block" *ngIf="ticket.TicketType!='Local' && ticket.Details.Arrival?.length == 1">Direk Uçuş</span>
+                </div>
+                <div class="coll column4 middle text-center">
+                    <div class="text-5 text-semibold text-nowrap">
+                        <span class="text-6 color-grey text-normal">
+                                ({{ticket.DestinationCode}})
+                                </span> {{ticket.ArrivalTime}}
+                    </div>
+
+                    <div class="text-5 text-semibold text-nowrap" *ngIf="ticket.R_ArrivalTime" style="margin-top:5px;">
+                        <span class="text-6 color-grey text-normal">
+                                ({{ticket.R_DestinationCode}})
+                                </span> {{ticket.R_ArrivalTime}}
+                    </div>
+                </div>
+                <div class="coll column5 text-right middle text-4 text-semibold">
+                    <button ion-button round outline icon-right (click)="ticketModal(ticket,'out')">
+                      Detay
+                      <ion-icon name="arrow-forward"></ion-icon>
+                    </button>
+                </div>
+
+            </div>
+            <div class="w100 table-display">
+                <div class="coll text-left middle text-7 text-nowrap" *ngIf="ticket.R_OperatingAirlineName">
+                    <img alt="{{ticket.R_OperatingAirlineName}}" src="http://api.biletkolay.net/cdn/airlinelogos/mobile/{{ticket.R_OperatingAirline}}.png" border="0" style="height:20px;vertical-align:middle;">
+                    <span [innerText]="ticket.R_OperatingAirlineName"></span>
+                </div>
+            </div>
+
+            <div class="w100 table-display">
+                <div class="coll text-left text-7 color-red text-nowrap text-semibold" *ngIf="ticket.SeatCount && ticket.SeatCount < 5">
+                    Son {{ticket.SeatCount}} koltuk
+                </div>
+                <div class="coll text-8 text-nowrap color-grey text-right" *ngIf="ticket.IsPromo == true">Promosyon</div>
+            </div>
+
+        </div>
+  </ion-item>
+</ion-list>
+
+</ion-content>

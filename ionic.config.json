@@ -1,5 +1,8 @@
 {
-  "name": "biletapp2",
-  "app_id": "",
-  "type": "ionic-angular"
+  "name": "biletjoy",
+  "app_id": "ced2be30",
+  "type": "ionic-angular",
+  "integrations": {
+    "cordova": {}
+  }
 }

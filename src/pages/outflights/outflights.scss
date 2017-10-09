@@ -1,0 +1,61 @@
+page-outflights {
+
+}
+
+
+    .w100{ width:100%;}
+    .display-block{ display:block;}
+    .text-right{ text-align:right}
+    .text-left{ text-align:left}
+    .text-center{ text-align:center}
+
+	.text-1 { font-size: 22px; } 
+	.text-2 { font-size: 20px; } 
+	.text-3 { font-size: 18px; } 
+	.text-4 { font-size: 16px; } 
+	.text-5 { font-size: 14px; } 
+	.text-6 { font-size: 12px; } 
+	.text-7 { font-size: 11px; } 
+	.text-8 { font-size: 10px; }
+
+
+	.text-light { font-weight: 300; } 
+	.text-normal { font-weight: 400; }  
+	.text-semibold { font-weight: 600; } 
+	.text-bold { font-weight: bold; } 
+	.text-nowrap { white-space: nowrap; }
+
+
+	.color-white,.text-white { color: #fefefe; } 
+	.color-blue,.text-blue { color: #37689D; } 
+	.color-grey { color: #d9d9d9; } 
+	.color-grey-2 { color: #868484; } 
+	.color-red { color: #d9534f; } 
+	.color-black,.text-black { color: #403f3f; } 
+	.color-green{color:#439B69;}
+
+
+	.ticket-list > ion-item { width: 100%;  position: relative; } 
+	.ticket-list> ion-item.foreign { min-height: 115px; max-height: 115px; } 
+	.ticket-list> ion-item .inner { width: 100%; position: relative; } 
+	.ticket-list .summary { width: 100%; margin: 3px auto; font-size:14px; } 
+	.ticket-list .summary .btn { padding: 3px 10px; font-size: 12px; } 
+
+	.ticketBox .column2 { width: 30% } 
+	.ticketBox .column3 { width: 20% } 
+	.ticketBox .column4 { width: 30% } 
+	.ticketBox .column6 { width: 20% }
+
+	.img-responsive{ display: block; max-width: 100%; height: auto; }
+
+	.table-display { display: table; table-layout: fixed; } 
+	.table-display.display1 .coll { padding: 30px 20px } 
+	.table-display.display2 .coll { padding: 15px 10px } 
+	.table-display .coll { display: table-cell; vertical-align: top; }
+	.table-display.nofixed { table-layout: auto; } 
+	.table-display .coll.middle,
+	.table-display.middle .coll { vertical-align: middle; } 
+	.table-display .coll.bottom,
+	.table-display.bottom .coll { vertical-align: bottom; } 
+
+

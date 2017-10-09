@@ -3,16 +3,72 @@
     <button ion-button menuToggle>
       <ion-icon name="menu"></ion-icon>
     </button>
-    <ion-title>Home</ion-title>
+    <ion-title text-center>Biletjoy</ion-title>
   </ion-navbar>
 </ion-header>
 
-<ion-content padding>
-  <h3>Ionic Menu Starter</h3>
+<ion-content>
+  <div class="cover cover-6 bg-light-grey" style="background-image:url(assets/img/background.jpg);">
+  <div class="inner" style="background-color: rgba(255, 255, 255, 0.7);">
+  <ion-grid>
+  <ion-row align-items-center>
+    <ion-col col-4 align-self-start text-center>
+      <div class="cityBox" (click)="placeModal({inputname: 'fromPlace',title:'Kalkış Yeri'})" tappable>
+        <span class="cityCode" text-center>{{getval('fromPlace','placeId' ,'NRD')}}</span>
+        <ion-badge>{{getval('fromPlace','city' ,'Nereden')}}</ion-badge>
+        <div class="text-7 text-center placeDetail">{{editPlaceName(getval('fromPlace','displayName' ,''))}}</div>
+      </div>
+    </ion-col>
+    <ion-col col-4 align-self-center text-center>
+         <img src="assets/img/departure-plane.svg" border="0">
+    </ion-col>
+    <ion-col col-4 align-self-start text-center>
+        <div class="cityBox" (click)="placeModal({inputname: 'toPlace',title:'Varış Yeri'})" tappable>
+          <span class="cityCode" text-center>{{getval('toPlace','placeId' ,'NRY')}}</span>
+          <ion-badge>{{getval('toPlace','city' ,'Nereye')}}</ion-badge>
+          <div class="text-7 text-center placeDetail">{{editPlaceName(getval('toPlace','displayName' ,''))}}</div>
+        </div>
+    </ion-col>
+  </ion-row>
+</ion-grid>
 
-  <p>
-    If you get lost, the <a href="http://ionicframework.com/docs/v2">docs</a> will show you the way.
-  </p>
+</div>
+</div>
 
-  <button ion-button secondary menuToggle>Toggle Menu</button>
+<ion-list>
+
+<ion-item>
+  <ion-icon name="calendar" color="primary" item-start></ion-icon>
+  <ion-label class="color-grey-2 text-5">Gidiş Tarihi</ion-label>
+  <ion-datetime item-end displayFormat="DD/MM/YYYY" [(ngModel)]="flightDate" min="{{minDate}}" max="{{maxDate}}" cancelText="Vazgeç" doneText="Tamam" placeholder=".. /.. / ...."></ion-datetime>
+</ion-item>
+
+<ion-item *ngIf="!oneWay">
+  <ion-icon name="calendar" color="primary" item-start></ion-icon>
+  <ion-label class="color-grey-2 text-5">Dönüş Tarihi </ion-label>
+  <ion-datetime item-end displayFormat="DD/MM/YYYY" [(ngModel)]="returnDate" min="{{flightDate}}" max="{{maxDate}}" cancelText="Vazgeç" doneText="Tamam" placeholder=".. /.. / ...."></ion-datetime>
+</ion-item>
+
+<ion-item *ngIf="returnDate" text-right>
+  <ion-label class="color-grey-2 text-5">Tek Yön</ion-label>
+  <ion-toggle [(ngModel)]="oneWay" checked="false"></ion-toggle>
+</ion-item>
+
+<ion-item>
+  <ion-icon name="person-add" color="primary" item-start></ion-icon>
+  <h3 class="color-grey-2 text-4">Yolcular</h3>
+  <button ion-button rounded small item-end color="light" (click)="passengerModal()">
+       {{getTotal('1')}} yolcu - {{getFlightClassText()}}
+  </button>
+</ion-item>
+
+<ion-item>
+  <ion-label class="text-5">Sadece aktarmasız uçuşlar</ion-label>
+  <ion-toggle [(ngModel)]="directFlight" checked="false"></ion-toggle>
+</ion-item>
+
+</ion-list>
+<div padding>
+  <button ion-button block secondary (click) = "goOutflights()">Bilet Bul</button>
+</div>
 </ion-content>

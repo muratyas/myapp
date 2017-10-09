@@ -1,0 +1,174 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Ödeme</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+
+<ion-list class="ticket-list">
+  <ion-list-header>Bilet Listesi</ion-list-header>
+
+  <ion-item *ngFor="let ticket of selectedTickets">
+
+            <div class="summary">
+            <div class="w100 table-display">
+                <div class="coll text-left middle text-7 text-nowrap">
+                    <img class="visible-xs pull-left" alt="{{ticket.OperatingAirlineName}}" src="http://api.biletkolay.net/cdn/airlinelogos/mobile/{{ticket.OperatingAirline}}.png" border="0" style="height:20px;vertical-align:middle;"> {{ticket.OperatingAirlineName}}
+                </div>
+
+            </div>
+            <div class="w100 ticketBox table-display nofixed">
+
+                <div class="coll column2 middle text-left">
+                    <div class="text-5 text-semibold  text-nowrap">
+                        {{ticket.DepartureTime}}
+                        <span class="text-6 color-grey text-normal">({{ticket.OriginCode}})</span>
+                    </div>
+                    <div class="text-5 text-semibold text-nowrap" style="margin-top:5px;" *ngIf="ticket.R_DepartureTime">
+                        {{ticket.R_DepartureTime}}
+                        <span class="text-6 color-grey text-normal">({{ticket.R_OriginCode}})</span>
+                    </div>
+                </div>
+                <div class="coll column3 top text-center">
+                    <img src="assets/img/departure-plane.svg" border="0" class="img-responsive">
+                    <span class="text-8 display-block" *ngIf="ticket.Details?.length > 1 || (ticket.TicketType!='Local' && ticket.Details.Departure?.length > 1)">Aktarmalı</span>
+                    <span class="text-8 display-block" *ngIf="ticket.Details?.length == 1 || (ticket.TicketType!='Local' && ticket.Details.Departure?.length == 1)">Direk Uçuş</span>
+
+                    <img src="assets/img/arrival-plane.svg" border="0" class="img-responsive" style="margin-top:10px;" *ngIf="ticket.TicketType!='Local' && ticket.Details.Arrival?.length">
+
+                    <span class="text-8 display-block" *ngIf="ticket.TicketType!='Local' && ticket.Details.Arrival?.length > 1">Aktarmalı</span>
+                    <span class="text-8 display-block" *ngIf="ticket.TicketType!='Local' && ticket.Details.Arrival?.length == 1">Direk Uçuş</span>
+                </div>
+                <div class="coll column4 middle text-right">
+                    <div class="text-5 text-semibold text-nowrap">
+                        <span class="text-6 color-grey text-normal">
+                                ({{ticket.DestinationCode}})
+                                </span> {{ticket.ArrivalTime}}
+                    </div>
+
+                    <div class="text-5 text-semibold text-nowrap" *ngIf="ticket.R_ArrivalTime" style="margin-top:5px;">
+                        <span class="text-6 color-grey text-normal">
+                                ({{ticket.R_DestinationCode}})
+                                </span> {{ticket.R_ArrivalTime}}
+                    </div>
+                </div>
+                <div class="coll column5 text-right middle text-4 text-semibold">
+                    <button ion-button round outline icon-right (click)="ticketModal(ticket,'out')">
+                      Detay
+                      <ion-icon name="arrow-forward"></ion-icon>
+                    </button>
+                </div>
+
+            </div>
+            <div class="w100 table-display">
+                <div class="coll text-left middle text-7 text-nowrap" *ngIf="ticket.R_OperatingAirlineName">
+                    <img alt="{{ticket.R_OperatingAirlineName}}" src="http://api.biletkolay.net/cdn/airlinelogos/mobile/{{ticket.R_OperatingAirline}}.png" border="0" style="height:20px;vertical-align:middle;">
+                    <span [innerText]="ticket.R_OperatingAirlineName"></span>
+                </div>
+            </div>
+
+
+        </div>
+  </ion-item>
+  <ion-list-header>Özet</ion-list-header>
+  <ion-item class="priceSummary">
+
+  <ion-grid>
+  <ion-row align-items-center>
+    <ion-col text-left>
+      Toplam : {{totalAmount | number:'2.2-2'}} TL
+    </ion-col>
+    <ion-col text-center>
+      {{passengerCount}} Kişi
+    </ion-col>
+    <ion-col text-right>
+        <button class="text-6" ion-button small round outline icon-right (click)="priceDetailModal(paxReferences)">
+          Detay
+          <ion-icon name="arrow-forward"></ion-icon>
+        </button>
+    </ion-col>
+  </ion-row>
+  </ion-grid>
+
+
+  </ion-item>
+</ion-list>
+
+<form #f="ngForm" (ngSubmit)="payment(f)" novalidate>
+
+<ion-list>
+
+  <ion-item id="cardNo">
+    <ion-label floating>Kart no</ion-label>
+    <ion-input type="tel" name="cardNo" [pattern]="creditCardPattern" [(ngModel)]="CardNumber" (ionFocus)="focus(cardnumber)" (ionBlur)="blur(cardnumber)" #cardnumber="ngModel" minlength="16" maxlength="16" required></ion-input>
+  </ion-item>
+
+  <div class="error-message" *ngIf="f.submitted && cardnumber.errors?.required && cardnumber.untouched">
+    <b>Lütfen kart no yazınız</b>
+  </div>
+  <div class="error-message" *ngIf="!cardnumber?.focussed && cardnumber.touched && cardnumber.invalid">
+    <b *ngIf="cardnumber.errors?.required">Lütfen kart no yazınız</b>
+    <b *ngIf="!cardnumber.errors?.required && cardnumber.invalid">Kart no hatalı</b>
+  </div>
+
+  <ion-item id="cardName">
+  <ion-label floating>Kart üzerindeki isim</ion-label>
+    <ion-input type="text" name="cardName" [(ngModel)]="CardHolder" (ionFocus)="focus(cardholder)" (ionBlur)="blur(cardholder)" (input)="uppercaseValue($event,'CardHolder')" minlength="2" maxlength="50" min="2" max="50" required #cardholder="ngModel"></ion-input>
+  </ion-item>
+
+  <div class="error-message" *ngIf="f.submitted && cardholder.errors?.required && cardholder.untouched">
+    <b>Lütfen kart üzerindeki ismi yazınız</b>
+  </div>
+  <div class="error-message" *ngIf="!cardholder?.focussed && cardholder.touched && cardholder.invalid">
+    <b *ngIf="cardholder.errors?.required">Lütfen kart üzerindeki ismi yazınız</b>
+    <b *ngIf="!cardholder.errors?.required && cardholder.invalid">Kart üzerindeki isim hatalı</b>
+  </div>
+
+  <ion-item id="cvc">
+  <ion-label floating>Güvenlik Kodu</ion-label>
+    <ion-input type="tel" name="cvc" [(ngModel)]="cv2" (ionFocus)="focus(securecode)" (ionBlur)="blur(securecode)" #securecode="ngModel" minlength="3" maxlength="3" required></ion-input>
+  </ion-item>
+
+  <div class="error-message" *ngIf="f.submitted && securecode.errors?.required && securecode.untouched">
+    <b>Lütfen güvenlik kodunu yazınız</b>
+  </div>
+  <div class="error-message" *ngIf="!securecode?.focussed && securecode.touched && securecode.invalid">
+    <b *ngIf="securecode.errors?.required">Lütfen güvenlik kodunu yazınız</b>
+    <b *ngIf="!securecode.errors?.required && securecode.invalid">Güvenlik Kodu hatalı</b>
+  </div>
+
+  <ion-item id="ExpMonth">
+    <ion-label>Son Kullanım</ion-label>
+      <ion-select name="ExpMonth" okText="Tamam" cancelText="Vazgeç" [(ngModel)]="ExpirationMonth" #expirationmonth="ngModel" required>
+        <ion-option value="01">01</ion-option>
+        <ion-option value="02">02</ion-option>
+      </ion-select>
+      <ion-select name="ExpYear" okText="Tamam" cancelText="Vazgeç" id="ExpYear" [(ngModel)]="ExpirationYear" #expirationyear="ngModel" required>
+        <ion-option value="17">17</ion-option>
+        <ion-option value="18">18</ion-option>
+        <ion-option value="19">19</ion-option>
+      </ion-select>
+  </ion-item>
+
+  <div class="error-message" *ngIf="f.submitted && ((expirationmonth.errors?.required && expirationmonth.untouched) || (expirationyear.errors?.required && expirationyear.untouched))">
+    <b>Lütfen son kullanım tarihini kontrol ediniz.</b>
+  </div>
+
+
+  <ion-item>
+  <ion-label>Taksit istiyorum</ion-label>
+  <ion-toggle name="installmentWant" [(ngModel)]="wantInstallment" (ionChange)="paymentOptionsModal(wantInstallment)" checked="false"></ion-toggle>
+  </ion-item>
+
+
+</ion-list>
+
+<div padding>
+  <button type="submit" ion-button block secondary>Ödeme Yap</button>
+</div>
+
+</form>
+
+
+</ion-content>
